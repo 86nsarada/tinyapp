@@ -61,3 +61,8 @@ res.redirect("/urls/9sm5xK/delete")
     res.json(urlDatabase)      
        // Respond with 'Ok' (we will replace this)
   });
+
+  app.post("/urls/:id",(req, res)=> {
+      console.log(req.body);
+      res.send("record id updated")
+  })
