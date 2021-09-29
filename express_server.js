@@ -9,9 +9,10 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+/*
 app.get("/", (req, res) => {
   res.send("Hello world!");
-});
+});*/
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
@@ -25,7 +26,7 @@ app.get("/urls.json", (req, res) => {
     res.send("<html><body>Hello <b>new World</b></body></html>\n");
   });
 
-  app.get("/urls", (req, res) => {
+  app.get("/", (req, res) => {
     const templateVars = { urls: urlDatabase };
     res.render("urls_index", templateVars);
   });
@@ -45,4 +46,18 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.post("/urls", (req, res) => {
     console.log(req.body);  // Log the POST request body to the console
     res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  });
+
+//   app.get("/u/:shortURL", (req, res) => {
+//     const longURL={longURL: req.params.longURL }
+//     res.redirect(longURL);
+//   });
+app.get("/delete",(req, res) =>{
+res.redirect("/urls/9sm5xK/delete")
+})
+  app.post("/urls/9sm5xK/delete", (req, res) => {
+    console.log(req.body); 
+    delete urlDatabase["9sm5xK"] 
+    res.json(urlDatabase)      
+       // Respond with 'Ok' (we will replace this)
   });
