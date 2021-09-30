@@ -36,7 +36,7 @@ app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase, username: "sarada" };
   res.render("urls_index", templateVars);
 });
-
+/*************************************************************/
 app.post("/urls", (req, res) => {
   let url_name= req.body.longURL;
   console.log(url_name)
@@ -54,6 +54,13 @@ app.get("/urls/:shortURL", (req, res) => {
   const templateVars = { shortURL: req.params.shortURL, longURL: req.params.longURL, username: "sarada" };
   res.render("urls_show", templateVars);
 });
+/********************************************************** */
+app.get("/u/:shortURL", (req, res) => {
+  let sortURL = req.params.shortURL;
+  console.log(sortURL)
+   let longURL = urlDatabase[sortURL]
+    res.redirect(longURL)
+});
 
 /********************************************************* */
 
@@ -62,7 +69,8 @@ const generateRandomString = function(){
   let result = '';
   const char='ABCDEFGHIJKLMNOPQRSTUVWXYZ'
   for(let i=0; i< 6; i++){
-      result += char.charAt(Math.floor(Math.random()*char.length));
+      result += char.charAt(Math.floor(Math.random()* char.length));
   }
   return result;
 }
+/************************************************************ */
