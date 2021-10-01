@@ -71,6 +71,51 @@ const generateRandomString = function(){
   for(let i=0; i< 6; i++){
       result += char.charAt(Math.floor(Math.random()* char.length));
   }
-  return result;
+  return result;  
 }
 /************************************************************ */
+//deleting URL
+app.post("/urls/:shortURL/delete",(req, res)=>{
+  console.log(req.params.shortURL)
+  delete urlDatabase[req.params.shortURL]
+  res.redirect("/urls");
+})
+
+/************************************************************* */
+//Update URL
+
+/*app.post("/urls/:id",(req,res) =>{
+  console.log(req.query._method)
+  if(req.query.edit){
+
+    let shortUrl = req.params.id;
+  console.log(shortUrl)
+  urlDatabase[shortUrl] = req.body.newURL
+  console.log(urlDatabase)
+  res.redirect("/urls")
+  }
+  else{
+  console.log("Inside update Method")
+  let urltoBeUpdate = req.params.id;
+  let longURL = urlDatabase[urltoBeUpdate]
+  
+  const templateVars = { longURL: longURL, 
+    shortURL: urltoBeUpdate, username: "sarada" };
+  res.render("urls_show",templateVars)
+}
+}) */
+
+app.post("/urls/edit/:id",(req,res) =>{
+  console.log("Inside Edit ")
+  
+
+    let shortUrl = req.params.id;
+  console.log(shortUrl)
+  urlDatabase[shortUrl] = req.body.newURL
+  console.log(urlDatabase)
+  res.redirect("/urls")
+  
+  
+})
+
+/*************************************************************** */
