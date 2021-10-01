@@ -100,6 +100,7 @@ app.post("/urls/:shortURL/delete",(req, res)=>{
 
 app.post("/urls/:id",(req,res) =>{
   
+  /*With request query string  */
   /*if(req.query.edit){
     let shortUrl = req.params.id;
   console.log(shortUrl)
