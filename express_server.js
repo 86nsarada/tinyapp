@@ -1,10 +1,24 @@
 const express = require("express");
 const app = express();
 const PORT = 8090; // default port 8080
+const uuid = require('uuid/v4');
 //*************************************************** */
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 /************************************************************ */
+
+const users = { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}
 
 //This tells the Express app to use EJS as its templating engine
 app.set("view engine", "ejs");
@@ -84,9 +98,9 @@ app.post("/urls/:shortURL/delete",(req, res)=>{
 /************************************************************* */
 //Update URL
 
-/*app.post("/urls/:id",(req,res) =>{
-  console.log(req.query._method)
-  if(req.query.edit){
+app.post("/urls/:id",(req,res) =>{
+  
+  /*if(req.query.edit){
 
     let shortUrl = req.params.id;
   console.log(shortUrl)
@@ -94,7 +108,7 @@ app.post("/urls/:shortURL/delete",(req, res)=>{
   console.log(urlDatabase)
   res.redirect("/urls")
   }
-  else{
+  else{*/
   console.log("Inside update Method")
   let urltoBeUpdate = req.params.id;
   let longURL = urlDatabase[urltoBeUpdate]
@@ -102,8 +116,8 @@ app.post("/urls/:shortURL/delete",(req, res)=>{
   const templateVars = { longURL: longURL, 
     shortURL: urltoBeUpdate, username: "sarada" };
   res.render("urls_show",templateVars)
-}
-}) */
+/*}*/
+}) 
 
 app.post("/urls/edit/:id",(req,res) =>{
   console.log("Inside Edit ")
@@ -118,4 +132,49 @@ app.post("/urls/edit/:id",(req,res) =>{
   
 })
 
+//finding user by email: Authentication helper function
+
+const foundUserByEmail=function(email, users){
+  for(let userId in users){
+    const user = users[userId]
+    if(email === user.email){
+      return user;
+    }
+  }
+  return false;
+}
+
+//if user not found:
+
+const userId = uuid().substring(0, 6);
+
 /*************************************************************** */
+//Login User:
+
+//recieve login
+// app.post('/login', (req, res) => {
+//   // if we here, we take for granted that the user is not logged in.
+//   const templateVars = { username: null };
+
+//   res.render('/login', templateVars);
+// });
+
+app.get("/register",(req, res)=>{
+  
+  const templateVars ={username: null}
+  res.render("register",templateVars)
+})
+
+app.post("/register",(req, res)=>{
+console.log(req.body)
+const {id, email, password} = req.body
+const userFound = foundUserByEmail(email)
+console.log("user found", userFound)
+//if userfound is true
+if(userFound){
+  return res.status(401).send("sorry, the user already exits")
+}
+
+//if user found is false ...register the user
+
+})
