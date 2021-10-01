@@ -136,7 +136,7 @@ app.post("/urls/edit/:id",(req,res) =>{
 
 //finding user by email: Authentication helper function
 
-const foundUserByEmail=function(email, users){
+const findUserByEmail=function(email, users){
   for(let userId in users){
     const user = users[userId]
     if(email === user.email){
@@ -165,9 +165,9 @@ const createUser = function ( email, password) {
 };
 
 
-const authenticateUser = function (email, password, usersDb) {
+const authenticateUser = function (email, password) {
   // retrieve the user from the db
-  const userFound = findUserByEmail(email, usersDb);
+  const userFound = findUserByEmail(email, users);
 
   // compare the passwords
   // password match => log in
@@ -180,15 +180,7 @@ const authenticateUser = function (email, password, usersDb) {
 };
 
 /*************************************************************** */
-//Login User:
-
-//recieve login
-// app.post('/login', (req, res) => {
-//   // if we here, we take for granted that the user is not logged in.
-//   const templateVars = { username: null };
-
-//   res.render('/login', templateVars);
-// });
+//authentication user check
 
 app.get("/register",(req, res)=>{
   
@@ -199,7 +191,7 @@ app.get("/register",(req, res)=>{
 app.post("/register",(req, res)=>{
 console.log(req.body)
 const {email, password} = req.body
-const userFound = foundUserByEmail(email)
+const userFound = findUserByEmail(email)
 if(userFound === false){
   let user = createUser(req.body.email,req.body.password)
   
@@ -213,4 +205,43 @@ else{
   }
 }
 
+});
+
+/**************************************************************** */
+
+app.get('/login', (req, res) => {
+  // if we here, we take for granted that the user is not logged in.
+  const templateVars = { username: null };
+
+  res.render('login', templateVars);
+});
+
+/********************************************************************/
+
+app.post('/login', (req, res) => {
+  // extract the email and password from the body of request => req.body
+
+  const email = req.body.email;
+  const password = req.body.password;
+
+
+  // compare the passwords
+  // password match => log in
+  // password dont' match => error message
+
+  const user = authenticateUser(email, password);
+console.log(user)
+  if (user) {
+    // user is authenticated
+    // setting the cookie
+    res.cookie('user_id', user.id);
+
+    // redirect to /urls
+    res.redirect('/urls'); //=> hey browser, can you do another request => get /urls
+    return;
+  }
+
+  // user is not authenticated => send error
+
+  res.status(401).send('Wrong credentials!');
 });
