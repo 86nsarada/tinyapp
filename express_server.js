@@ -1,7 +1,8 @@
 const express = require("express");
 const app = express();
 const PORT = 8090; // default port 8080
-const uuid = require('uuid');
+const uuid = require('uuid')
+const cookieParser = require('cookie-parser');
 //*************************************************** */
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
@@ -100,6 +101,7 @@ app.post("/urls/:shortURL/delete",(req, res)=>{
 
 app.post("/urls/:id",(req,res) =>{
   
+
   /*if(req.query.edit){
 
     let shortUrl = req.params.id;
@@ -146,7 +148,36 @@ const foundUserByEmail=function(email, users){
 
 //if user not found:
 
-//const userId = uuid().substring(0, 6);
+const createUser = function ( email, password) {
+  //const userId = generateRandomString();
+  const userId = uuid.v4().substr(0,8);
+
+  // adding to an object
+  // objectname[key] = value
+  // Create a new user
+  users[userId] = {
+    id: userId,
+    email,
+    password,
+  };
+
+  return userId;
+};
+
+
+const authenticateUser = function (email, password, usersDb) {
+  // retrieve the user from the db
+  const userFound = findUserByEmail(email, usersDb);
+
+  // compare the passwords
+  // password match => log in
+  // password dont' match => error message
+  if (userFound && userFound.password === password) {
+    return userFound;
+  }
+
+  return false;
+};
 
 /*************************************************************** */
 //Login User:
@@ -167,14 +198,19 @@ app.get("/register",(req, res)=>{
 
 app.post("/register",(req, res)=>{
 console.log(req.body)
-const {id, email, password} = req.body
+const {email, password} = req.body
 const userFound = foundUserByEmail(email)
-console.log("user found", userFound)
-//if userfound is true
-if(userFound){
-  return res.status(400).send("sorry, the user already exits")
+if(userFound === false){
+  let user = createUser(req.body.email,req.body.password)
+  
+  res.status(200).send("User successfully created with user Id "+ JSON.stringify(users[user].email))
+}
+else{
+  console.log("user found", userFound)
+  //if userfound is true
+  if(userFound){
+    return res.status(400).send("sorry, the user already exits")
+  }
 }
 
-//if user found is false ...register the user
-
-})
+});
