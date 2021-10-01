@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const PORT = 8090; // default port 8080
-const uuid = require('uuid/v4');
+const uuid = require('uuid');
 //*************************************************** */
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
@@ -146,7 +146,7 @@ const foundUserByEmail=function(email, users){
 
 //if user not found:
 
-const userId = uuid().substring(0, 6);
+//const userId = uuid().substring(0, 6);
 
 /*************************************************************** */
 //Login User:
@@ -172,7 +172,7 @@ const userFound = foundUserByEmail(email)
 console.log("user found", userFound)
 //if userfound is true
 if(userFound){
-  return res.status(401).send("sorry, the user already exits")
+  return res.status(400).send("sorry, the user already exits")
 }
 
 //if user found is false ...register the user
