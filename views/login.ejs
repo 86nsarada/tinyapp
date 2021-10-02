@@ -12,6 +12,11 @@
     <%- include("partials/_header.ejs") %>
     <main style="margin: 1em;">
     <h3>Login</h3>
+    <% if (message && message != undefined) { %> 
+    <span>
+        <div  style="color:red;"><%= message%></div>
+    </span>
+    <% } %>
     <form method="POST" action="/login">
     <div class="form-group mb-2">
       <label for="email">Email Address:</label>

@@ -12,7 +12,7 @@ const users = {
   "userRandomID": {
     id: "userRandomID", 
     email: "user@example.com", 
-    password: "purple-monkey-dinosaur"
+    password: "123456"
   },
  "user2RandomID": {
     id: "user2RandomID", 
@@ -20,18 +20,30 @@ const users = {
     password: "dishwasher-funk"
   }
 }
-
+var loggedInuser= {};
 //This tells the Express app to use EJS as its templating engine
 app.set("view engine", "ejs");
 
+// const urlDatabase = {
+//   "b2xVn2": "http://www.lighthouselabs.ca",
+//   "9sm5xK": "http://www.google.com"
+// };
+
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: {
+      longURL: "https://www.tsn.ca",
+      userID: "user2RandomID"
+  },
+  i3BoGr: {
+      longURL: "https://www.google.ca",
+      userID: "aJ48lW"
+  }
 };
 //*************************************************** */
+/*
 app.get("/", (req, res) => {
   res.send("Hello!");
-});
+});*/
 //******************************************************* */
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
@@ -48,33 +60,65 @@ app.get("/hello", (req, res) => {
 });
 /********************************************************* */
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: "sarada" };
+  if(loggedInuser.email){
+    let filteredJson = getUserUrls(loggedInuser.id)
+    console.log(filteredJson);
+  const templateVars = { urls: filteredJson, username: loggedInuser.id };
+  //console.log(templateVars)
   res.render("urls_index", templateVars);
+  }
+  else{
+    res.redirect("/")
+  }
 });
 /*************************************************************/
 app.post("/urls", (req, res) => {
+  if(loggedInuser.email){
   let url_name= req.body.longURL;
-  console.log(url_name)
+  //console.log(url_name)
   let randomUrlString = generateRandomString();
-  urlDatabase[randomUrlString] = url_name;
+  let newurl ={longURL: url_name, userID: loggedInuser.id}
+  urlDatabase[randomUrlString] = newurl;
+  
   res.redirect("/urls")
+}
+else{
+  res.redirect("/")
+}
 });
 /********************************************************* */
 app.get("/urls/new", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: "sarada" };
+  if(loggedInuser.email){
+  const templateVars = { urls: urlDatabase, username: loggedInuser.id };
   res.render("urls_new",templateVars);
+  
+  }
+  else{
+    res.redirect("/")
+  }
 });
 /********************************************************* */
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: req.params.longURL, username: "sarada" };
+  if(loggedInuser.email){
+  const templateVars = { shortURL: req.params.shortURL, longURL: req.params.longURL, username: loggedInuser.id };
   res.render("urls_show", templateVars);
+  }
+  else{
+    res.redirect("/")
+  }
 });
 /********************************************************** */
 app.get("/u/:shortURL", (req, res) => {
+  if(loggedInuser.email){
   let sortURL = req.params.shortURL;
   console.log(sortURL)
-   let longURL = urlDatabase[sortURL]
+  console.log(urlDatabase)
+   let longURL = urlDatabase[sortURL].longURL
     res.redirect(longURL)
+  }
+  else{
+    res.redirect("/")
+  }
 });
 
 /********************************************************* */
@@ -91,9 +135,14 @@ const generateRandomString = function(){
 /************************************************************ */
 //deleting URL
 app.post("/urls/:shortURL/delete",(req, res)=>{
-  console.log(req.params.shortURL)
-  delete urlDatabase[req.params.shortURL]
+  if(loggedInuser.email){
+  //console.log(req.params.shortURL)
+  delete urlDatabase[req.params.shortURL] 
   res.redirect("/urls");
+  }
+  else{
+    res.redirect("/")
+  }
 })
 
 /************************************************************* */
@@ -101,7 +150,7 @@ app.post("/urls/:shortURL/delete",(req, res)=>{
 
 app.post("/urls/:id",(req,res) =>{
   
-
+if(loggedInuser.email){
   /*if(req.query.edit){
 
     let shortUrl = req.params.id;
@@ -111,29 +160,36 @@ app.post("/urls/:id",(req,res) =>{
   res.redirect("/urls")
   }
   else{*/
-  console.log("Inside update Method")
+  //console.log("Inside update Method")
   let urltoBeUpdate = req.params.id;
-  let longURL = urlDatabase[urltoBeUpdate]
+  let longURL = urlDatabase[urltoBeUpdate].longURL
   
   const templateVars = { longURL: longURL, 
-    shortURL: urltoBeUpdate, username: "sarada" };
+    shortURL: urltoBeUpdate, username: loggedInuser.id };
   res.render("urls_show",templateVars)
+}
+else{
+  res.redirect("/")
+}
 /*}*/
 }) 
-
+/*********************************************************************** */
 app.post("/urls/edit/:id",(req,res) =>{
-  console.log("Inside Edit ")
+  if(loggedInuser.email){
+  //console.log("Inside Edit ")
   
 
     let shortUrl = req.params.id;
-  console.log(shortUrl)
-  urlDatabase[shortUrl] = req.body.newURL
-  console.log(urlDatabase)
+  //console.log(shortUrl)
+  urlDatabase[shortUrl].longURL = req.body.newURL
+  //console.log(urlDatabase)
   res.redirect("/urls")
-  
+}
+else{
+}
   
 })
-
+/******************************************************************** */
 //finding user by email: Authentication helper function
 
 const findUserByEmail=function(email, users){
@@ -145,7 +201,7 @@ const findUserByEmail=function(email, users){
   }
   return false;
 }
-
+/********************************************************************* */
 //if user not found:
 
 const createUser = function ( email, password) {
@@ -164,15 +220,20 @@ const createUser = function ( email, password) {
   return userId;
 };
 
+/***************************************************************** */
 
 const authenticateUser = function (email, password) {
   // retrieve the user from the db
   const userFound = findUserByEmail(email, users);
 
+    loggedInuser = userFound;
+
+    console.log(loggedInuser)
+
   // compare the passwords
   // password match => log in
   // password dont' match => error message
-  if (userFound && userFound.password === password) {
+  if (userFound) {
     return userFound;
   }
 
@@ -189,16 +250,16 @@ app.get("/register",(req, res)=>{
 })
 
 app.post("/register",(req, res)=>{
-console.log(req.body)
+//console.log(req.body)
 const {email, password} = req.body
 const userFound = findUserByEmail(email)
 if(userFound === false){
   let user = createUser(req.body.email,req.body.password)
-  
-  res.status(200).send("User successfully created with user Id "+ JSON.stringify(users[user].email))
+  res.redirect("/")
+  //res.status(200).send("User successfully created with user Id "+ JSON.stringify(users[user].email))
 }
 else{
-  console.log("user found", userFound)
+  //console.log("user found", userFound)
   //if userfound is true
   if(userFound){
     return res.status(400).send("sorry, the user already exits")
@@ -209,9 +270,9 @@ else{
 
 /**************************************************************** */
 
-app.get('/login', (req, res) => {
+app.get('/', (req, res) => {
   // if we here, we take for granted that the user is not logged in.
-  const templateVars = { username: null };
+  const templateVars = { username: null ,message: null};
 
   res.render('login', templateVars);
 });
@@ -230,18 +291,51 @@ app.post('/login', (req, res) => {
   // password dont' match => error message
 
   const user = authenticateUser(email, password);
-console.log(user)
+//console.log(user)
   if (user) {
+    if(user.email === email && user.password === password){
     // user is authenticated
     // setting the cookie
     res.cookie('user_id', user.id);
 
     // redirect to /urls
     res.redirect('/urls'); //=> hey browser, can you do another request => get /urls
-    return;
+    }
+    else{
+
+      let templateVars = {username: null,message : "Wrong credentials entered. Please correct them"}
+      res.render("login",templateVars)
+    }
+  }else{
+    //res.status(401).send('User Not Registered');
+    res.redirect("/register")
   }
 
   // user is not authenticated => send error
 
-  res.status(401).send('Wrong credentials!');
+  
 });
+
+
+
+
+//*********************************************************************** */
+
+app.post("/logout", (req, res) => {
+  req.session = null;
+  loggedInuser ={}
+  res.redirect('/');
+});
+
+const getUserUrls = (userId) =>{
+
+  let filterJson = {};
+  for (let urlObj in urlDatabase){
+    console.log(urlDatabase)
+    
+    if(urlDatabase[urlObj].userID === userId){
+      filterJson[urlObj] = urlDatabase[urlObj]
+    }
+  }
+  return filterJson;
+}
