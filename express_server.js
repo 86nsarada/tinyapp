@@ -3,6 +3,7 @@ const app = express();
 const PORT = 8090; // default port 8080
 const uuid = require('uuid')
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcryptjs');
 //*************************************************** */
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
@@ -208,15 +209,18 @@ const createUser = function ( email, password) {
   //const userId = generateRandomString();
   const userId = uuid.v4().substr(0,8);
 
+  let hashedPassword =bcrypt.hashSync( password,10);
+  console.log(hashedPassword)
   // adding to an object
   // objectname[key] = value
   // Create a new user
   users[userId] = {
     id: userId,
-    email,
-    password,
+    email: email,
+    password: hashedPassword,
   };
 
+  console.log(users)
   return userId;
 };
 
@@ -291,9 +295,12 @@ app.post('/login', (req, res) => {
   // password dont' match => error message
 
   const user = authenticateUser(email, password);
+  console.log(user)
 //console.log(user)
   if (user) {
-    if(user.email === email && user.password === password){
+
+     let comparePassword = bcrypt.compareSync(password,user.password)
+    if(user.email === email && comparePassword === true){
     // user is authenticated
     // setting the cookie
     res.cookie('user_id', user.id);
@@ -339,3 +346,4 @@ const getUserUrls = (userId) =>{
   }
   return filterJson;
 }
+
