@@ -5,6 +5,7 @@ const uuid = require('uuid')
 const cookieParser = require('cookie-parser');
 const sessions = require('express-session');
 const bcrypt = require('bcryptjs');
+const findUser = require('./helpers')
 //*************************************************** */
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
@@ -197,18 +198,7 @@ else{
 }
   
 })
-/******************************************************************** */
-//finding user by email: Authentication helper function
 
-const findUserByEmail=function(email, users){
-  for(let userId in users){
-    const user = users[userId]
-    if(email === user.email){
-      return user;
-    }
-  }
-  return false;
-}
 /********************************************************************* */
 //if user not found:
 
@@ -235,7 +225,7 @@ const createUser = function ( email, password) {
 
 const authenticateUser = function (email, password) {
   // retrieve the user from the db
-  const userFound = findUserByEmail(email, users);
+  const userFound =  findUser(email, users);
 
     loggedInuser = userFound;
 
@@ -263,7 +253,7 @@ app.get("/register",(req, res)=>{
 app.post("/register",(req, res)=>{
 //console.log(req.body)
 const {email, password} = req.body
-const userFound = findUserByEmail(email)
+const userFound = findUser(email)
 if(userFound === false){
   let user = createUser(req.body.email,req.body.password)
   res.redirect("/")
