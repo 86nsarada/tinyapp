@@ -3,12 +3,13 @@ const app = express();
 const PORT = 8090; // default port 8080
 const uuid = require('uuid')
 const cookieParser = require('cookie-parser');
+const sessions = require('express-session');
 const bcrypt = require('bcryptjs');
 //*************************************************** */
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 /************************************************************ */
-
+const oneDay = 1000 * 60 * 60* 34
 const users = { 
   "userRandomID": {
     id: "userRandomID", 
@@ -22,6 +23,7 @@ const users = {
   }
 }
 var loggedInuser= {};
+var session;
 //This tells the Express app to use EJS as its templating engine
 app.set("view engine", "ejs");
 
@@ -40,6 +42,11 @@ const urlDatabase = {
       userID: "aJ48lW"
   }
 };
+
+app.use(sessions({secret: "This is my session",
+saveUninitialized: true,
+cookie: {maxAge: oneDay},
+resave: false}))
 //*************************************************** */
 /*
 app.get("/", (req, res) => {
@@ -303,7 +310,9 @@ app.post('/login', (req, res) => {
     if(user.email === email && comparePassword === true){
     // user is authenticated
     // setting the cookie
-    res.cookie('user_id', user.id);
+   res.cookie('user_id',user.id)
+    session=req.session;
+    session.user_id = user.id;
 
     // redirect to /urls
     res.redirect('/urls'); //=> hey browser, can you do another request => get /urls
