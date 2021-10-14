@@ -13,6 +13,11 @@
   <%- include("partials/_header.ejs") %>
   <main style="margin: 1em;">
     <h3>My URLs</h3>
+    <% if (message && message != undefined) { %> 
+      <span>
+          <div  style="color:red;"><%= message%></div>
+      </span>
+      <% } %>
     <table class="table">
       <thead>
         <tr>

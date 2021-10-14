@@ -1,10 +1,4 @@
 /******************************************************************** */
-<<<<<<< Updated upstream
-//finding user by email: Authentication helper function
-
-const findUserByEmail = function(email, users) {
-=======
-<<<<<<< HEAD
 
 //finding user by email: Authentication helper function
 
@@ -35,12 +29,6 @@ const urlDatabase = {
 };
 
 const findUserByEmail = function (email, users) {
-=======
-//finding user by email: Authentication helper function
-
-const findUserByEmail = function(email, users) {
->>>>>>> main
->>>>>>> Stashed changes
   for (let userId in users) {
     const user = users[userId];
     if (email === user.email) {
@@ -50,10 +38,6 @@ const findUserByEmail = function(email, users) {
   return false;
 };
 
-<<<<<<< Updated upstream
-module.exports = findUserByEmail;
-=======
-<<<<<<< HEAD
 const passwordEncrypt = (users) => {
   for (let usr in users) {
     const user = users[usr];
@@ -127,7 +111,3 @@ module.exports = {
   users,
   urlDatabase,
 };
-=======
-module.exports = findUserByEmail;
->>>>>>> main
->>>>>>> Stashed changes

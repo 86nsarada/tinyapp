@@ -4,15 +4,7 @@
   "description": "tinyapp: implement a basic web server using Express. second project in lighthouse labs",
   "main": "express_server.js",
   "scripts": {
-<<<<<<< Updated upstream
-    "start": "./node_modules/.bin/nodemon -L express_server.js",
-=======
-<<<<<<< HEAD
     "start": "node express_server.js",
-=======
-    "start": "./node_modules/.bin/nodemon -L express_server.js",
->>>>>>> main
->>>>>>> Stashed changes
     "test": "./node_modules/mocha/bin/mocha"
   },
   "repository": {
@@ -35,16 +27,8 @@
     "express": "^4.17.1",
     "express-session": "^1.17.2",
     "request": "^2.88.2",
-<<<<<<< Updated upstream
-    "uuid": "^8.3.2"
-=======
-<<<<<<< HEAD
     "uuid": "^8.3.2",
     "valid-url": "^1.0.9"
-=======
-    "uuid": "^8.3.2"
->>>>>>> main
->>>>>>> Stashed changes
   },
   "devDependencies": {
     "chai": "^4.3.4",
