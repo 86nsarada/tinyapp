@@ -1,7 +1,7 @@
 /******************************************************************** */
 
 //finding user by email: Authentication helper function
-
+const uuid = require("uuid");
 const bcrypt = require("bcryptjs");
 
 const users = {

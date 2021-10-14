@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const PORT = 8090; // default port 8080
-const uuid = require("uuid");
+
 const sessions = require("express-session");
 const bcrypt = require("bcryptjs");
 const {
