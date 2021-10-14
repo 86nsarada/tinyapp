@@ -2,7 +2,6 @@ const express = require("express");
 const app = express();
 const PORT = 8090; // default port 8080
 const uuid = require("uuid");
-const cookieParser = require("cookie-parser");
 const sessions = require("express-session");
 const bcrypt = require("bcryptjs");
 const {
@@ -318,8 +317,6 @@ app.post("/login", (req, res) => {
     let comparePassword = bcrypt.compareSync(password, user.password);
     if (user.email === email && comparePassword === true) {
       // user is authenticated
-      // setting the cookie
-      res.cookie("user_id", user.id);
       session = req.session;
       session.userId = user.id;
 
