@@ -52,14 +52,18 @@ app.get("/hello", (req, res) => {
 /********************************************************* */
 app.get("/urls", (req, res) => {
   session = req.session;
+  let errmessage = null;
   if (session.email) {
     let filteredJson = getUserUrls(session.userId);
-
+    if (session.err_msg) {
+      errmessage = session.err_msg;
+      session.err_msg = "";
+    }
     session = req.session;
     const templateVars = {
       urls: filteredJson,
       username: session.email,
-      message: null,
+      message: errmessage,
     };
 
     res.render("urls_index", templateVars);
@@ -119,32 +123,19 @@ app.get("/u/:shortURL", (req, res) => {
 
     let userURI = urlDatabase[sortURL];
 
-    if (userURI.userID === session.userId) {
+    if (userURI && userURI.userID === session.userId) {
       let usrltoRedirect = urlDatabase[sortURL].longURL;
 
       if (validUrl.isUri(usrltoRedirect)) {
         res.redirect(usrltoRedirect);
       } else {
-        let filteredJson = getUserUrls(session.userId);
-
-        session = req.session;
-        const templateVars = {
-          urls: filteredJson,
-          username: session.email,
-          message: "URL trying to access is not reachable",
-        };
-        res.render("urls_index", templateVars);
+        session.err_msg = "URL trying to access is not reachable";
+        res.redirect("/urls");
       }
     } else {
-      let filteredJson = getUserUrls(session.userId);
-
-      session = req.session;
-      const templateVars = {
-        urls: filteredJson,
-        username: session.email,
-        message: "URL trying to access is not related to the login user",
-      };
-      res.render("urls_index", templateVars);
+      session.err_msg =
+        "URL Trying to access is not present in the url Database";
+      res.redirect("/urls");
     }
   } else {
     res.redirect("/");
@@ -159,21 +150,21 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   session = req.session;
   if (session.email) {
     let usersUri = urlDatabase[req.params.shortURL];
-    if (usersUri.userID === session.userId) {
-      delete urlDatabase[req.params.shortURL];
+
+    if (usersUri) {
+      if (usersUri.userID === session.userId) {
+        delete urlDatabase[req.params.shortURL];
+      } else {
+        session.err_msg = "URL trying to delete is not belongs to login User";
+        res.redirect("/urls");
+      }
+
+      res.redirect("/urls");
     } else {
-      let filteredJson = getUserUrls(session.userId);
-
-      session = req.session;
-      const templateVars = {
-        urls: filteredJson,
-        username: session.email,
-        message: "URL trying to delete is not belongs to login User",
-      };
-      res.render("urls_index", templateVars);
+      session.err_msg =
+        "URL Trying to access is not present in the url Database";
+      res.redirect("/urls");
     }
-
-    res.redirect("/urls");
   } else {
     res.redirect("/");
   }
@@ -200,26 +191,26 @@ app.post("/urls/:id", (req, res) => {
     let urltoBeUpdate = req.params.id;
 
     let userUri = urlDatabase[urltoBeUpdate];
-    if (userUri.userID === session.userId) {
-      let longURL = urlDatabase[urltoBeUpdate].longURL;
 
-      const templateVars = {
-        longURL: longURL,
-        shortURL: urltoBeUpdate,
-        username: session.userId,
-        message: null,
-      };
-      res.render("urls_show", templateVars);
+    if (userUri) {
+      if (userUri.userID === session.userId) {
+        let longURL = urlDatabase[urltoBeUpdate].longURL;
+
+        const templateVars = {
+          longURL: longURL,
+          shortURL: urltoBeUpdate,
+          username: session.userId,
+          message: null,
+        };
+        res.render("urls_show", templateVars);
+      } else {
+        session.err_msg = "URL trying to update is not belongs to login User";
+        res.redirect("/urls");
+      }
     } else {
-      let filteredJson = getUserUrls(session.userId);
-
-      session = req.session;
-      const templateVars = {
-        urls: filteredJson,
-        username: session.email,
-        message: "URL trying to update is not belongs to login User",
-      };
-      res.render("urls_index", templateVars);
+      session.err_msg =
+        "URL trying to access is not present in the URL database";
+      res.redirect("/urls");
     }
   } else {
     res.redirect("/");
